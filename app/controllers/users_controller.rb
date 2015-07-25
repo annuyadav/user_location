@@ -6,7 +6,22 @@ class UsersController < ApplicationController
   end
 
   def show
-    @near_by_users = @user.nearbys(20)
+    @hash = Gmaps4rails.build_markers(@user.nearbys(20)) do |user, marker|
+      marker.lat user.latitude
+      marker.lng user.longitude
+      marker.infowindow user.name
+    end
+
+    @hash << {
+        lat: @user.latitude,
+        lng: @user.longitude,
+        infowindow: 'Your location',
+        picture: {
+            url: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+            width: 36,
+            height: 36
+        }
+    }
   end
 
   def new

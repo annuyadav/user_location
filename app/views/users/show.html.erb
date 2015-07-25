@@ -8,17 +8,29 @@
 </p>
 
 
-<h4>Near by users</h4>
-<div>
-  <% markers = "" %>
-  <% @near_by_users.each do |user| %>
-      <% markers << "&markers=color:blue%7C#{user.latitude}%2C#{user.longitude}" %>
-  <li><%= user.name %> : <%= user.address %></li>
-  <% end %>
+<div class="map_container">
+  <div id="map" class="map"></div>
 </div>
 
-<%= image_tag "http://maps.google.com/maps/api/staticmap?size=1000x500&zoom=12&maptype=roadmap&sensor=false&
-zoom=16&markers=#{@user.latitude}%2C#{@user.longitude}#{markers}" %>
 
 <%= link_to 'Edit', edit_user_path(@user) %> |
 <%= link_to 'Back', users_path %>
+
+<script>
+    var handler = Gmaps.build('Google');
+    handler.buildMap({internal: {id: 'map'}}, function () {
+
+        var circles = handler.addCircles(
+                [{lat: <%= @user.latitude %>, lng: <%= @user.longitude %>, radius: 20000}],
+                {strokeColor: '#FF0000', strokeOpacity: 0.7, strokeWeight: 1, fillColor: '#FF0000', fillOpacity: 0.15}
+        );
+        var markers = handler.addMarkers(<%=raw @hash.to_json %>);
+
+        handler.bounds.extendWith(markers);
+        handler.bounds.extendWith(circles);
+        handler.fitMapToBounds();
+
+    });
+    handler.map.centerOn({lat: <%= @user.latitude %>, lng: <%= @user.longitude %>});
+
+</script>
